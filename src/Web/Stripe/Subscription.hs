@@ -8,6 +8,7 @@ module Web.Stripe.Subscription
     , SubTrialEnd(..)
     , SubAtPeriodEnd(..)
     , createSub
+    , getSub
     , updateSubRCard
     , updateSubToken
     , updateSub
@@ -106,6 +107,13 @@ createSub cid pid mcpnid mste =
         odata = [ ("coupon",    textToByteString . unCpnId     <$> mcpnid)
                 , ("trial_end", showByteString . unSubTrialEnd <$> mste)
                 ]
+
+-- | Retrieves a 'Subscription'
+getSub :: MonadIO m => CustomerId -> StripeT m Subscription
+getSub cid =
+  snd `liftM` query (subRq cid []) { sMethod = GET }
+
+
 
 -- | Internal convenience function to update a 'Subscription'.
 updateSub :: MonadIO m => [(B.ByteString, B.ByteString)] -> CustomerId -> PlanId
